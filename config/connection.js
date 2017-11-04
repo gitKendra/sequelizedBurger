@@ -1,30 +1,31 @@
-// Setup MySQL connection
-var mysql = require("mysql");
-var connection;
+// *********************************************************************************
+// CONNECTION.JS - THIS FILE INITIATES THE CONNECTION TO MYSQL
+// *********************************************************************************
 
-if(process.env.JAWSDB_URL){
-  // Heroku-JawsDB Connection
-  connection = mysql.createConnection(process.env.JAWSDB_URL);
-}
-else{
-  // MySQL DB Connection Information
-  connection = mysql.createConnection({
-    host: "localhost",
-    user: "root",
-    password: "root",
-    database: "burgers_db",
-    port: 8889
-  });
-}
+// Dependencies
+var Sequelize = require("sequelize");
 
-// Initiate MySQL Connection.
-connection.connect(function(err) {
-  if (err) {
-    console.error("Error connecting: " + err.stack);
-    return;
+// Creates mySQL connection using Sequelize
+var sequelize = new Sequelize("burgersdb", "root", "root", {
+  host: "localhost",
+  port: 8889,
+  dialect: "mysql",
+  pool: {
+    max: 5,
+    min: 0,
+    idle: 10000
   }
-  console.log("Connected to database");
 });
 
-// Export the connection for the ORM
-module.exports = connection;
+// Test connection
+sequelize
+  .authenticate()
+  .then(() => {
+    console.log('Connection has been established successfully.');
+  })
+  .catch(err => {
+    console.error('Unable to connect to the database:', err);
+  });
+
+// Exports the connection for other files to use
+module.exports = sequelize;
